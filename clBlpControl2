@@ -1,0 +1,93 @@
+'----------------------------------------------
+'New Blooomberg API COM 3.5 Library Usage Here
+'
+'
+'   JZ  5/14/15
+'----------------------------------------------
+Option Explicit
+
+Private BlpSession As blpapicomLib2.session
+Dim refdataservice As blpapicomLib2.Service
+Public req As REQUEST
+
+'Initialize the Bloomberg ActiveX Control
+Private Sub Class_Initialize()
+
+    Set BlpSession = New blpapicomLib2.session
+    BlpSession.QueueEvents = True
+    BlpSession.Start
+   
+    BlpSession.OpenService ("//blp/refdata")
+    Set refdataservice = BlpSession.GetService("//blp/refdata")
+    
+End Sub
+
+'Destroy the Bloomberg COM Control
+Private Sub Class_Terminate()
+   Set BlpSession = Nothing
+End Sub
+
+Public Function BlpSubscribe() As Variant
+     'BlpSubscribe = blpControl.BlpSubscribe(ticker, field)
+    Dim nRow As Long
+   
+    Set req = refdataservice.CreateRequest("ReferenceDataRequest")
+End Function
+
+Public Function BlpSendRequest() As Variant
+    Dim eventObj As blpapicomLib2.Event
+    Dim curRow As Integer
+     
+    BlpSession.SendRequest req
+          
+     Do
+        Set eventObj = BlpSession.NextEvent() ' this will block code execution until the next event is received
+        If eventObj.EventType = PARTIAL_RESPONSE Or eventObj.EventType = RESPONSE Then
+            Dim it As blpapicomLib2.MessageIterator
+            Set it = eventObj.CreateMessageIterator()
+            
+            Dim blp_res(0, 0) As Variant
+            
+            'security.GetElement("fieldData").NumElements - 1, msg.GetElement("securityData").NumValues - 1)
+            
+            Do While it.Next()
+                Dim msg As Message
+                Set msg = it.Message
+                
+                Dim numSecurities As Integer
+                numSecurities = msg.GetElement("securityData").NumValues
+                
+                Dim i As Integer
+                    
+                For i = 0 To numSecurities - 1
+                    Dim security As Element
+                    Set security = msg.GetElement("securityData").GetValue(i)
+                    'Sheet1.Cells(curRow + 4, 4).Value = security.GetElement("security").Value
+                    Dim fields As Element
+                    Set fields = security.GetElement("fieldData")
+                    Dim numFields As Integer
+                    numFields = fields.NumElements
+                    
+                    Dim a As Integer
+                    For a = 0 To numFields - 1
+                        Dim field As Element
+                        Set field = fields.GetElement(a)
+                        'Sheet1.Cells(curRow + 4, a + 5).Value = field.Name & " = " & field.Value
+                        blp_res(i, a) = field.Value
+                    Next
+                    curRow = curRow + 1
+                Next
+            Loop
+            
+            If eventObj.EventType = RESPONSE Then Exit Do
+            
+        End If
+    Loop
+   
+   BlpSendRequest = blp_res
+End Function
+
+
+
+
+
