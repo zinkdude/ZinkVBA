@@ -1,0 +1,57 @@
+Public Function WebPullJim1() As String
+    'http://cbs.marketwatch.com/tools/quotes/quotes.asp?symb=dna&siteid=mktw&dist=mktwqn
+    'http://quote.bloomberg.com/apps/quote?ticker=dna
+    
+    Dim objXML As XMLHTTP
+    Dim tempFile As String
+    Dim Num2012 As String
+    Dim tempStr As String
+    Dim year_count As Integer
+        
+    tempFile = "C:\capture.xlsx"
+
+    
+        
+    'create an instance of the XMLHTTP component
+    Set objXML = New XMLHTTP
+    'Server.CreateObject ("Microsoft.XMLHTTP")
+
+    strURL = "http://gerencialpublico.cmb.gov.br/PROD_BEBIDAS_MENSAL.html"
+    'get the strURL
+    objXML.Open "GET", strURL, False, "", ""
+    'send the information
+    objXML.Send
+    'if we have no errors
+    If Err.Number = 0 Then
+        'and the url is valid
+        If objXML.Status = 200 Then
+            strOpen = objXML.ResponseText
+                                                        
+            startpoint = InStr(strOpen, pcqFindStr)
+            endpoint = InStr(startpoint, strOpen, "</div>", vbTextCompare)
+            'Find the 4th <td
+            For i = 1 To year_count
+                'startpoint =
+                startpoint = InStr(startpoint, strOpen, "<td class=""tdFormat1"">", vbTextCompare) + 23
+                            
+            Next i
+            
+            startpoint = startpoint + Len("<div class=""texto6"">") + 2
+            endpoint = InStr(startpoint, strOpen, "</div>", vbTextCompare)
+            endpoint = endpoint - 1
+            tempStr = Mid$(strOpen, startpoint + 1, endpoint - startpoint)
+                        
+            'Call AddCapturePoint(tempStr, tempFile, 1)
+            
+            
+        Else
+            'bad url display a message
+            WebPullJim1 = "Incorrect URL"
+        End If
+    Else
+        'if we do have an error display the description of the error
+        Debug.Print Err.description
+    End If
+    'clear up
+    Set objXML = Nothing
+End Function
