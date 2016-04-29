@@ -1,0 +1,17 @@
+<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui"> 
+  <ribbon startFromScratch="false"> 
+    <tabs> 
+      <tab id="bpTab2" label="MY COMPANY" keytip="B"> 
+        <group id="group1"> 
+	    <menu id="menu1" label="MY MENU ITEM NAME" keytip="P" >
+  		  <menuSeparator id="separator0" title="SECTION 1"/>
+		  <button id="btn1" label="do Report" description="do Main Report" imageMso="PivotTableGrandTotalsOffForRowsAndColumns" onAction="mnu_doRpt" />
+	
+		  <menuSeparator id="separator1" title="SECTION 2"/>
+		  <button id="btn9" label="do &amp;Summary" description="do Summary" imageMso="AutoFormat" onAction="mnu_doSummary" />
+		  		  /menu>
+        </group> 
+      </tab> 
+    </tabs> 
+  </ribbon> 
+</customUI>
